@@ -9,10 +9,8 @@ import { configureChains, createClient, useAccount } from "wagmi";
 import { arbitrum, mainnet, polygon } from "wagmi/chains";
 
 const Game = () => {
-    const { address } = useAccount()
     const chains = [arbitrum, mainnet, polygon];
     const { open } = useWeb3Modal();
-    // Wagmi client
     const { provider } = configureChains(chains, [
         walletConnectProvider({ projectId: "8d6445f6a0eca8324853158ac3778024" }),
     ]);
@@ -21,8 +19,9 @@ const Game = () => {
         connectors: modalConnectors({ appName: "web3Modal", chains }),
         provider,
     });
-    // Web3Modal Ethereum Client
+    const { address } = useAccount()
     const ethereumClient = new EthereumClient(wagmiClient, chains);
+
     useEffect(() => {
         console.log(address)
     })
