@@ -9,7 +9,7 @@ import { configureChains, createClient, useAccount } from "wagmi";
 import { arbitrum, mainnet, polygon } from "wagmi/chains";
 
 const Game = () => {
-    const { address, isConnected } = useAccount()
+    const { address } = useAccount()
     const chains = [arbitrum, mainnet, polygon];
     const { open } = useWeb3Modal();
     // Wagmi client
