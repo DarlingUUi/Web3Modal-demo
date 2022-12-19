@@ -4,11 +4,27 @@ import {
     walletConnectProvider,
 } from "@web3modal/ethereum";
 import { useWeb3Modal, Web3Modal } from "@web3modal/react";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { configureChains, createClient, useAccount } from "wagmi";
 import { arbitrum, mainnet, polygon } from "wagmi/chains";
+import { Unity, useUnityContext } from "react-unity-webgl";
 
 const Game = () => {
+    const {
+        UNSAFE__detachAndUnloadImmediate: detachAndUnloadImmediate,
+        unityProvider,
+        loadingProgression,
+        isLoaded,
+        addEventListener,
+        removeEventListener,
+        sendMessage
+    } = useUnityContext({
+        loaderUrl: "Shiba/Build/Shiba.loader.js",
+        dataUrl: "Shiba/Build/Shiba.data",
+        frameworkUrl: "Shiba/Build/Shiba.framework.js",
+        codeUrl: "Shiba/Build/Shiba.wasm",
+        streamingAssetsUrl: "Shiba/StreamingAssets",
+    });
     const chains = [arbitrum, mainnet, polygon];
     const { open } = useWeb3Modal();
     const { provider } = configureChains(chains, [
@@ -22,14 +38,35 @@ const Game = () => {
     const { address } = useAccount()
     const ethereumClient = new EthereumClient(wagmiClient, chains);
 
+    const connectWallet = useCallback(() => {
+        if (!address)
+            open();
+        else {
+            // alert(address);
+            console.log(isLoaded);
+            sendMessage("ConnectWalletController", "SetWalletAddress", address + "");
+        }
+    }, [address, sendMessage]);
     useEffect(() => {
-        console.log(address)
-    })
+        addEventListener("ConnectWallet", connectWallet);
+        return () => {
+            removeEventListener("ConnectWallet", connectWallet);
+        }
+    }, [connectWallet])
+
+    useEffect(() => {
+        return () => {
+            try {
+                detachAndUnloadImmediate();
+            } catch { }
+        };
+    }, [detachAndUnloadImmediate]);
     return (
         <>
-            {
-                address ? <p>{address}</p> : <button onClick={open}>Connect To Metamask Wallet</button>
-            }
+            {!isLoaded && (
+                <p>Loading Application... {Math.round(loadingProgression * 100)}%</p>
+            )}
+            <Unity unityProvider={unityProvider} style={{ width: 1280, height: 720 }} />
             <Web3Modal
                 projectId="8d6445f6a0eca8324853158ac3778024"
                 ethereumClient={ethereumClient}
