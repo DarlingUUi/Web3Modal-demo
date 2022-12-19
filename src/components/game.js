@@ -42,17 +42,15 @@ const Game = () => {
         if (!address)
             open();
         else {
-            // alert(address);
-            console.log(isLoaded);
             sendMessage("ConnectWalletController", "SetWalletAddress", address + "");
         }
-    }, [address, sendMessage]);
+    }, [address, sendMessage, open]);
     useEffect(() => {
         addEventListener("ConnectWallet", connectWallet);
         return () => {
             removeEventListener("ConnectWallet", connectWallet);
         }
-    }, [connectWallet])
+    }, [connectWallet, addEventListener, removeEventListener])
 
     useEffect(() => {
         return () => {
