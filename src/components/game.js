@@ -8,6 +8,7 @@ import { useCallback, useEffect } from "react";
 import { configureChains, createClient, useAccount } from "wagmi";
 import { arbitrum, mainnet, polygon } from "wagmi/chains";
 import { Unity, useUnityContext } from "react-unity-webgl";
+import axios from "axios";
 
 const Game = () => {
     const {
