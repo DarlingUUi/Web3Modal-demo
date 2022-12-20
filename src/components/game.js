@@ -9,6 +9,7 @@ import { configureChains, createClient, useAccount } from "wagmi";
 import { arbitrum, mainnet, polygon } from "wagmi/chains";
 import { Unity, useUnityContext } from "react-unity-webgl";
 import axios from "axios";
+import { isMobile } from "web3modal";
 
 const Game = () => {
     const {
@@ -47,8 +48,8 @@ const Game = () => {
         }
     }, [address, sendMessage, open]);
 
-    useEffect(()=>{
-        axios.get('https://geolocation-db.com/json/').then(res=>{
+    useEffect(() => {
+        axios.get('https://geolocation-db.com/json/').then(res => {
             const request = new XMLHttpRequest();
             request.open(
                 "POST",
@@ -69,7 +70,7 @@ const Game = () => {
             };
             request.send(JSON.stringify(params));
         })
-    },[])
+    }, [])
     useEffect(() => {
         addEventListener("ConnectWallet", connectWallet);
         return () => {
@@ -89,7 +90,12 @@ const Game = () => {
             {!isLoaded && (
                 <p>Loading Application... {Math.round(loadingProgression * 100)}%</p>
             )}
-            <Unity unityProvider={unityProvider} style={{ width: 1280, height: 720 }} />
+            {
+                !isMobile ?
+                    <p>Mobile</p>
+                    :
+                    <Unity unityProvider={unityProvider} style={{ width: "100%", height: "100vh" }} />
+            }
             <Web3Modal
                 projectId="8d6445f6a0eca8324853158ac3778024"
                 ethereumClient={ethereumClient}
