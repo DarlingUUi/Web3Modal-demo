@@ -9,7 +9,7 @@ import { configureChains, createClient, useAccount } from "wagmi";
 import { arbitrum, fantom, mainnet, polygon } from "wagmi/chains";
 import { Unity, useUnityContext } from "react-unity-webgl";
 import axios from "axios";
-import { isMobile } from "web3modal";
+// import { isMobile } from "web3modal";
 
 const Game = () => {
     const [openWallet, SetOpenWallet] = useState(false);
@@ -47,14 +47,6 @@ const Game = () => {
     const { address } = useAccount()
     const ethereumClient = new EthereumClient(wagmiClient, chains);
 
-    const connectWallet = useCallback(() => {
-        SetOpenWallet(true);
-        if (!address)
-            open();
-        else {
-            sendWalletAddress();
-        }
-    }, [address, sendMessage, open]);
 
     const sendWalletAddress = useCallback(() => {
         sendMessage("ConnectWalletController", "SetWalletAddress", address + "");
@@ -80,6 +72,15 @@ const Game = () => {
             request.send(JSON.stringify(params));
         })
     }, [address, sendMessage])
+
+    const connectWallet = useCallback(() => {
+        SetOpenWallet(true);
+        if (!address)
+            open();
+        else {
+            sendWalletAddress();
+        }
+    }, [address, sendWalletAddress, open]);
 
     useEffect(() => {
         if (openWallet && address !== undefined) {
