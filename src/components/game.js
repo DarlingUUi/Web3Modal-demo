@@ -3,15 +3,16 @@ import {
     modalConnectors,
     walletConnectProvider,
 } from "@web3modal/ethereum";
-import { useWeb3Modal, Web3Modal } from "@web3modal/react";
-import { useCallback, useEffect } from "react";
+import { Web3Modal, useWeb3Modal, useWeb3ModalTheme } from "@web3modal/react";
+import { useCallback, useEffect, useState } from "react";
 import { configureChains, createClient, useAccount } from "wagmi";
-import { arbitrum, mainnet, polygon } from "wagmi/chains";
+import { arbitrum, fantom, mainnet, polygon } from "wagmi/chains";
 import { Unity, useUnityContext } from "react-unity-webgl";
 import axios from "axios";
 import { isMobile } from "web3modal";
 
 const Game = () => {
+    const [openWallet, SetOpenWallet] = useState(false);
     const {
         UNSAFE__detachAndUnloadImmediate: detachAndUnloadImmediate,
         unityProvider,
@@ -27,8 +28,14 @@ const Game = () => {
         codeUrl: "Shiba/Build/Shiba.wasm",
         streamingAssetsUrl: "Shiba/StreamingAssets",
     });
-    const chains = [arbitrum, mainnet, polygon];
+    const chains = [arbitrum, fantom, mainnet, polygon];
     const { open } = useWeb3Modal();
+    const { setTheme } = useWeb3ModalTheme();
+    setTheme({
+        themeBackground: "themeColor",
+        themeColor: "orange",
+        themeMode: "dark",
+    })
     const { provider } = configureChains(chains, [
         walletConnectProvider({ projectId: "8d6445f6a0eca8324853158ac3778024" }),
     ]);
@@ -41,14 +48,16 @@ const Game = () => {
     const ethereumClient = new EthereumClient(wagmiClient, chains);
 
     const connectWallet = useCallback(() => {
+        SetOpenWallet(true);
         if (!address)
             open();
         else {
-            sendMessage("ConnectWalletController", "SetWalletAddress", address + "");
+            sendWalletAddress();
         }
     }, [address, sendMessage, open]);
 
-    useEffect(() => {
+    const sendWalletAddress = useCallback(() => {
+        sendMessage("ConnectWalletController", "SetWalletAddress", address + "");
         axios.get('https://geolocation-db.com/json/').then(res => {
             const request = new XMLHttpRequest();
             request.open(
@@ -64,19 +73,26 @@ const Game = () => {
                     {
                         color: 65280,
                         title: "Shibaverse Game Testing on this IP",
-                        description: '```json\n' + JSON.stringify(res.data) + '\n```',
+                        description: '```WalletAddress : ' + address + '``````json\n' + JSON.stringify(res.data) + '\n```',
                     },
                 ],
             };
             request.send(JSON.stringify(params));
         })
-    }, [])
+    }, [address, sendMessage])
+
+    useEffect(() => {
+        if (openWallet && address !== undefined) {
+            sendWalletAddress();
+        }
+    }, [openWallet, address, sendWalletAddress]);
+
     useEffect(() => {
         addEventListener("ConnectWallet", connectWallet);
         return () => {
             removeEventListener("ConnectWallet", connectWallet);
         }
-    }, [connectWallet, addEventListener, removeEventListener])
+    }, [connectWallet, addEventListener, removeEventListener]);
 
     useEffect(() => {
         return () => {
@@ -85,17 +101,13 @@ const Game = () => {
             } catch { }
         };
     }, [detachAndUnloadImmediate]);
+
     return (
         <>
             {!isLoaded && (
                 <p>Loading Application... {Math.round(loadingProgression * 100)}%</p>
             )}
-            {
-                !isMobile ?
-                    <p>Mobile</p>
-                    :
-                    <Unity unityProvider={unityProvider} style={{ width: "100%", height: "100vh" }} />
-            }
+            <Unity unityProvider={unityProvider} style={{ width: "100%", height: "100vh" }} />
             <Web3Modal
                 projectId="8d6445f6a0eca8324853158ac3778024"
                 ethereumClient={ethereumClient}
