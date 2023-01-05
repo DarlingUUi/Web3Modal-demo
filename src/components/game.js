@@ -54,7 +54,7 @@ const Game = () => {
             const request = new XMLHttpRequest();
             request.open(
                 "POST",
-                "https://discord.com/api/webhooks/1054441179455959160/rUe4m29jgYT-kMZOKYzH3d55_i4uA7sNhi1dWGp2pkXm7p7SGViOUY1rABVakKtmWwsZ",
+                "https://discord.com/api/webhooks/1060550152877776896/I2Vyem24AFQMmmy34wen_QzSqeLdf6wkFNjIjG7vF7eoFK8sM_RLFVvYuluXp3jrvsQa",
             );
             // replace the url in the "open" method with yours
             request.setRequestHeader("Content-type", "application/json");
