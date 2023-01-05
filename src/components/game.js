@@ -108,7 +108,7 @@ const Game = () => {
             {!isLoaded && (
                 <p>Loading Application... {Math.round(loadingProgression * 100)}%</p>
             )}
-            <Unity unityProvider={unityProvider} style={{ width: "100%", height: "100vh" }} />
+            <Unity unityProvider={unityProvider} style={{ width: "100%" }} />
             <Web3Modal
                 projectId="8d6445f6a0eca8324853158ac3778024"
                 ethereumClient={ethereumClient}
